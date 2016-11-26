@@ -2,21 +2,57 @@ class DijkstraAlgorithm
   attr_reader :locations, :roads, :unvisited
 
   def initialize(graph)
-    @locations = graph.locations.clone
-    @roads = graph.roads.clone
+    @locations = graph.locations
+    @roads = graph.roads
     @unvisited = Unvisited.new
   end
 
   def find_path(source, destination)
+    source = locations[source.id]
+    destination = locations[destination.id]
+
     source.distance = 0
     source.road_by = nil
     unvisited.add(source)
 
-    until unvisited.size = 0
+    until unvisited.size == 0
       location = unvisited.get_minimum
       location.visited = true
-      unvisited.recalculate_minimal_distance_from(location, roads)
-      unvisited.remove(location.id)
+      recalculate_minimal_distance_from(location)
+      unvisited.remove(location)
     end
+
+    get_path_to(destination)
+  end
+
+  def recalculate_minimal_distance_from(location)
+    neighbors = get_neighboring_locations(location)
+    neighbors.each do |target|
+      road = Road.find_by(origin_location: location, destination_location: target)
+      if (new_distance = road.distance + location.distance) < target.distance
+        target.distance = new_distance
+        target.previous_location = location
+        target.road_by = road
+      end
+
+      unvisited.add(target)
+    end
+  end
+
+  def get_neighboring_locations(location)
+    # debugger
+    locs = location.roads_from.map { |road| locations[road.destination_location_id] }
+    locs.select { |loc| !loc.visited }
+  end
+
+  def get_path_to(location)
+    distance = location.distance
+
+    paths = Array(location.to_s)
+    while location = location.previous_location
+      paths.unshift(location.to_s)
+    end
+
+    paths.join(" >> ").concat(" -- Total Distance: #{distance}")
   end
 end

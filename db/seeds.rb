@@ -33,3 +33,11 @@ PlacesArray::PLACES.sample(65).combination(2).each do |places|
 
   sleep 2
 end
+
+Location.order(id: :asc).distinct(:name).each do |location|
+  Location.where(name: location.name).order(id: :asc).offset(1).each do |loc|
+    location.roads_from << loc.roads_from
+    location.roads_to << loc.roads_to
+    loc.delete
+  end
+end
