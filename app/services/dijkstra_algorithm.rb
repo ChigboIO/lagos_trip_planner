@@ -15,7 +15,8 @@ class DijkstraAlgorithm
     until unvisited.size = 0
       location = unvisited.get_minimum
       location.visited = true
-      unvisited
+      unvisited.recalculate_minimal_distance_from(location, roads)
+      unvisited.remove(location.id)
     end
   end
 end
