@@ -53,6 +53,6 @@ class DijkstraAlgorithm
       paths.unshift(location.to_s)
     end
 
-    paths.join(" >> ").concat(" -- Total Distance: #{distance}")
+    paths.join(" >> ").concat(" -- Total Distance: #{distance} meters")
   end
 end
