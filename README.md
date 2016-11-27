@@ -1,4 +1,6 @@
-== README
+# Lagos Trip Planner
+
+Welcome to Lagos trip Planner. This utility basically helps users to determine the most efficient route to take while traversing locations in Lagos State.
 
 This README would normally document whatever steps are necessary to get the
 application up and running.
