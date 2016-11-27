@@ -1,30 +1,26 @@
 # Lagos Trip Planner
 
+
 Welcome to Lagos trip Planner. This utility basically helps users to determine the most efficient route to take while traversing locations in Lagos State.
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Usage
 
-Things you may want to cover:
+* Ensure you have ruby installed on your local machine
+* Clone this repository.
+* Run ```bundle install```
+* Then you fire up your rails server
+* Visit your localhost's url and then watch the app in action.
 
-* Ruby version
+You will not need to run any migrations to initialize your database. The data used comes straight out of the box.
 
-* System dependencies
+All you will need to do is to enter a depature location in Lagos State and then a Destination Location and then you will be presented with the route to take.
 
-* Configuration
+## Limitations
 
-* Database creation
+* This app is not yet live on production
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* There are currently no test suites for this app
+* There are limited requests to the google distance matrix api so we had to use multiple api keys to make the required requests. We had to trim down the number of requests we made and we also assumed that any two locations that are more than 10 km apart do not have a direct connecting road. All of these factors affect the correctness of the results.
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+
