@@ -3,8 +3,8 @@ class HomeController < ApplicationController
   end
 
   def search
-    @origin, @destination = params[:origin], params[:destination]
-    @dest, @path = algo.find_path(Location.where(name: @origin), Location.find_by(name: @destination))
+    @origin, @destination = params[:origin].downcase, params[:destination].downcase
+    @dest, @path = algo.find_path(Location.find(name: @origin), Location.find_by(name: @destination))
     respond_to do |format|
       format.js { render :search}
     end
