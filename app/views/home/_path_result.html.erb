@@ -1,0 +1,35 @@
+<% if @path %>
+  <h5>From <%= @origin %> To <%= @destination %>, the following path is taken:</h5>
+  <table id="roadsTable" class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>Distance (meters)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @path.each_cons(2).each do |from, to| %>
+        <% from.roads_from.where.not(origin_location: from).where.not(destination_location: to).limit(3).each do |road| %>
+          <tr class="warning">
+            <td><%= from.to_s %></td>
+            <td><%= road.destination_location.to_s %></td>
+            <td><%= road.distance %></td>
+          </tr>
+        <% end %>
+        <tr class="success">
+          <% r = Road.find_by(origin_location: from, destination_location: to) %>
+          <td><%= from.to_s %></td>
+          <td><%= to.to_s %></td>
+          <td><%= r.distance %></td>
+        </tr>
+      <% end %>
+      <tr class="info bold">
+        <td colspan="2">Total Distance</td>
+        <td><%= @dest.distance %> meters</td>
+      </tr>
+    </tbody>
+  </table>
+<% else %>
+  <h4>No route found for your search</h4>
+<% end %>

@@ -22,7 +22,7 @@ class DijkstraAlgorithm
       unvisited.remove(location)
     end
 
-    get_path_to(destination)
+    return destination, get_path_to(destination) if destination.distance < Fixnum::MAX
   end
 
   def recalculate_minimal_distance_from(location)
@@ -46,13 +46,11 @@ class DijkstraAlgorithm
   end
 
   def get_path_to(location)
-    distance = location.distance
-
-    paths = Array(location.to_s)
+    paths = Array(location)
     while location = location.previous_location
-      paths.unshift(location.to_s)
+      paths.unshift(location)
     end
 
-    paths.join(" >> ").concat(" -- Total Distance: #{distance} meters")
+    paths
   end
 end

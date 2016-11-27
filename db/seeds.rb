@@ -59,13 +59,13 @@ Location.order(:id).combination(2).each do |places|
         to = Road.find_or_create_by(origin_location: loc_1, destination_location: loc_2, distance: distance)
         fro = Road.find_or_create_by(origin_location: loc_2, destination_location: loc_1, distance: distance)
 
-        puts "Created Roads:     #{loc_1}  <<=====>> #{loc_2}  -- Distance: #{distance} meters"
+        puts "#{count}) Created Roads:     #{loc_1}  <<=====>> #{loc_2}  -- Distance: #{distance} meters"
       else
         to = Road.find_or_create_by(origin_location: loc_1, destination_location: loc_2, distance: 0)
-        puts "Request between #{loc_1} and #{loc_2} was not successful: #{status}"
+        puts "#{count}) Request between #{loc_1} and #{loc_2} was not successful: #{status}"
       end
     else
-      puts "Request between #{loc_1}(id = #{loc_1.id}) and #{loc_2} was not successful: #{response['status']}"
+      puts "#{count}) Request between #{loc_1}(id = #{loc_1.id}) and #{loc_2} was not successful: #{response['status']}"
       puts "Reached Query Limit. Breaking Off..."
       break
     end

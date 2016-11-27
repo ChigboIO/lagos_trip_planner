@@ -1,5 +1,15 @@
 class HomeController < ApplicationController
   def index
-    @path = algo.find_path(Location.all.sample, Location.all.sample)
+  end
+
+  def search
+    @origin, @destination = params[:origin], params[:destination]
+    @dest, @path = algo.find_path(Location.where(name: @origin), Location.find_by(name: @destination))
+    respond_to do |format|
+      format.js { render :search}
+    end
+  end
+
+  def roads
   end
 end

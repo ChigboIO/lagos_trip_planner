@@ -1,3 +1,7 @@
+#path-finding-progress {
+  display: none;
+}
+
 #map {
   height: 100%;
 }
@@ -9,7 +13,7 @@ html, body {
   padding: 0;
 }
 
-#locationField, #controls {
+/*#locationField, #controls {
   position: relative;
   width: 480px;
 }
@@ -18,7 +22,7 @@ html, body {
   top: 0px;
   left: 0px;
   width: 99%;
-}
+}*/
 .label {
   text-align: right;
   font-weight: bold;
@@ -43,7 +47,8 @@ html, body {
 .wideField {
   width: 200px;
 }
-#locationField {
+/*#locationField {
   height: 20px;
   margin-bottom: 2px;
 }
+*/

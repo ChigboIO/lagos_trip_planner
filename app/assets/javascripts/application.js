@@ -14,3 +14,15 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+
+function pathProgress() {
+  $('#search-form').submit(function(e) {
+    $('#path-div').empty();
+    $('#path-finding-progress').show();
+  });
+}
+
+document.addEventListener("turbolinks:load", function () {
+  $('#roadsTable').DataTable();
+  pathProgress();
+})

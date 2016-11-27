@@ -1,0 +1,20 @@
+<div class="container" style="padding-top: 5em">
+  <table id="roadsTable" class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>To</th>
+        <th>Distance (meters)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @roads.each do |road| %>
+        <tr>
+          <td><%= road.origin_location.to_s %></td>
+          <td><%= road.destination_location.to_s %></td>
+          <td><%= road.distance %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
