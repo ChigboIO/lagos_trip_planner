@@ -1,7 +1,28 @@
 require_relative './places_array'
 
-Road.destroy_all
-Location.destroy_all
+# Road.destroy_all
+# Location.destroy_all
+
+# Location.connection.execute("INSERT INTO locations(name, latitude, longitude) VALUES #{PlacesArray::PLACES}")
+
+# Method to calculate distance between two points on earth surfae
+def distance_apart(loc1, loc2)
+  rad_per_deg = Math::PI/180  # PI / 180
+  rkm = 6371                  # Earth radius in kilometers
+  rm = rkm * 1000             # Radius in meters
+
+  dlat_rad = (loc2[0]-loc1[0]) * rad_per_deg  # Delta, converted to rad
+  dlon_rad = (loc2[1]-loc1[1]) * rad_per_deg
+
+  lat1_rad, lon1_rad = loc1.map {|i| i * rad_per_deg }
+  lat2_rad, lon2_rad = loc2.map {|i| i * rad_per_deg }
+
+  a = Math.sin(dlat_rad/2)**2 + Math.cos(lat1_rad) * Math.cos(lat2_rad) * Math.sin(dlon_rad/2)**2
+  c = 2 * Math::atan2(Math::sqrt(a), Math::sqrt(1-a))
+
+  rm * c # Delta in meters
+end
+
 
 conn = Faraday.new('https://maps.googleapis.com') do |faraday|
   faraday.request  :url_encoded             # form-encode POST params
@@ -9,35 +30,47 @@ conn = Faraday.new('https://maps.googleapis.com') do |faraday|
   faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
 end
 
-PlacesArray::PLACES.sample(65).combination(2).each do |places|
-  response = conn.get '/maps/api/distancematrix/json',
-                    { origins: places[0], destinations: places[1], key: ENV['GOOGLE_API_KEY'] }
+count = 0
+Location.order(:id).combination(2).each do |places|
+  loc_1 = places[0]
+  loc_2 = places[1]
+  dist = distance_apart([loc_1.latitude, loc_1.longitude], [loc_2.latitude, loc_2.longitude])
 
-  response = JSON.parse(response.body)
+  to = Road.find_by(origin_location: loc_1, destination_location: loc_2)
+  next if to
 
-  status = response['rows'][0]['elements'][0]['status']
-  if status == "OK"
-    distance = response['rows'][0]['elements'][0]['distance']['value']
-    loc_1 = Location.create(name: response['origin_addresses'].first)
-    loc_2 = Location.create(name: response['destination_addresses'].first)
+  if dist <= 10000
+    response = conn.get(
+      '/maps/api/distancematrix/json',
+      {
+        origins: "#{loc_1.latitude},#{loc_1.longitude}",
+        destinations: "#{loc_2.latitude},#{loc_2.longitude}",
+        key: ENV['GOOGLE_API_KEY']
+      }
+    )
 
-    to = Road.create(origin_location: loc_1, destination_location: loc_2, distance: distance)
-    fro = Road.create(origin_location: loc_2, destination_location: loc_1, distance: distance)
+    response = JSON.parse(response.body)
 
-    puts "Created Location: #{loc_1}"
-    puts "Created Location: #{loc_2}"
-    puts "Create Roads:     #{loc_1}  <<=====>> #{loc_2}  -- Distance: #{distance}"
-  else
-    puts "Request between #{places[0]} and #{places[1]} was not successful: #{status}"
+    if response['status'] == "OK"
+      status = response['rows'][0]['elements'][0]['status']
+      if status == "OK"
+        distance = response['rows'][0]['elements'][0]['distance']['value']
+
+        to = Road.find_or_create_by(origin_location: loc_1, destination_location: loc_2, distance: distance)
+        fro = Road.find_or_create_by(origin_location: loc_2, destination_location: loc_1, distance: distance)
+
+        puts "Created Roads:     #{loc_1}  <<=====>> #{loc_2}  -- Distance: #{distance} meters"
+      else
+        to = Road.find_or_create_by(origin_location: loc_1, destination_location: loc_2, distance: 0)
+        puts "Request between #{loc_1} and #{loc_2} was not successful: #{status}"
+      end
+    else
+      puts "Request between #{loc_1}(id = #{loc_1.id}) and #{loc_2} was not successful: #{response['status']}"
+      puts "Reached Query Limit. Breaking Off..."
+      break
+    end
+
+    count += 1
   end
-
-  sleep 2
 end
-
-Location.order(id: :asc).distinct(:name).each do |location|
-  Location.where(name: location.name).order(id: :asc).offset(1).each do |loc|
-    location.roads_from << loc.roads_from
-    location.roads_to << loc.roads_to
-    loc.delete
-  end
-end
+puts count
