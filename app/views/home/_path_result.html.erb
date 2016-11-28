@@ -10,7 +10,7 @@
     </thead>
     <tbody>
       <% @path.each_cons(2).each do |from, to| %>
-        <% from.roads_from.where.not(origin_location: from).where.not(destination_location: to).limit(3).each do |road| %>
+        <% from.roads_from.where.not(destination_location: to).limit(3).each do |road| %>
           <tr class="warning">
             <td><%= from.to_s %></td>
             <td><%= road.destination_location.to_s %></td>
